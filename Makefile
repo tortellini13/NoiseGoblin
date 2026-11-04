@@ -17,43 +17,30 @@ endif
 # ================================
 VERSION := 0.1.0-alpha
 CXX := g++
-CXX_FLAGS := -g -Wall -Wextra -O3 -fno-strict-aliasing -Wswitch -DLL_VERSION='"$(VERSION)"'
-LIB_FLAGS := -ldl -lpthread -lm
-INCLUDE := -Iinclude -Ilibs # -Ilibs/imgui
+CXX_FLAGS := -g -Wall -Wextra -O3 -fno-strict-aliasing -Wswitch -DVERSION='"$(VERSION)"'
+LIB_FLAGS :=
+INCLUDE := -Iinclude -Ilibs
+
+STATIC ?= 0
+
+ifeq ($(STATIC),1)
+    LDFLAGS := -static -static-libgcc -static-libstdc++
+else
+    LDFLAGS :=
+endif
 
 # ================================
-#          ImGui setup
+# Platform-specific flags
 # ================================
-# IMGUI_DIR      := libs/imgui
-# IMGUI_BACKENDS := $(IMGUI_DIR)/backends
+ifeq ($(PLATFORM),WINDOWS)
+    LIB_FLAGS :=
+    CXX_FLAGS += -DPLATFORM_WINDOWS
+endif
 
-# IMGUI_SRC := \
-#     $(IMGUI_DIR)/imgui.cpp \
-#     $(IMGUI_DIR)/imgui_draw.cpp \
-#     $(IMGUI_DIR)/imgui_widgets.cpp \
-#     $(IMGUI_DIR)/imgui_tables.cpp \
-# #    $(IMGUI_DIR)/imgui_demo.cpp
-
-# ifeq ($(PLATFORM),WINDOWS)
-#     IMGUI_SRC += \
-#         $(IMGUI_BACKENDS)/imgui_impl_win32.cpp \
-#         $(IMGUI_BACKENDS)/imgui_impl_dx11.cpp
-#     LIB_FLAGS += -ld3d11 -ld3dcompiler -ldxgi -lgdi32 -luser32 -ldwmapi \
-# 				 -LC:/msys64/mingw64/lib
-#     PLATFORM_INCLUDE := -I$(IMGUI_BACKENDS) -IC:/msys64/mingw64/include
-#     CXX_FLAGS += -DPLATFORM_WINDOWS
-# endif
-
-# ifeq ($(PLATFORM),LINUX)
-#     IMGUI_SRC += \
-#         $(IMGUI_BACKENDS)/imgui_impl_sdl2.cpp \
-#         $(IMGUI_BACKENDS)/imgui_impl_opengl3.cpp
-#     LIB_FLAGS += -lGL -lSDL2 -ldl -lpthread `sdl2-config --libs`
-#     PLATFORM_INCLUDE := -I$(IMGUI_BACKENDS)
-#     CXX_FLAGS += -DPLATFORM_LINUX
-# endif
-
-# INCLUDE += -I$(IMGUI_DIR) $(PLATFORM_INCLUDE)
+ifeq ($(PLATFORM),LINUX)
+    LIB_FLAGS := -ldl -lpthread -lm
+    CXX_FLAGS += -DPLATFORM_LINUX
+endif
 
 # ================================
 #       Source directories
@@ -63,7 +50,8 @@ OBJ_DIR := build
 BIN := NoiseGoblin
 
 # Source files
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp) \
+             libs/miniaudio.cpp
 
 # Object files (works for files anywhere)
 OBJ_FILES := $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
@@ -77,7 +65,7 @@ all: $(BIN)
 #  Link objects into executable
 # ================================
 $(BIN): $(OBJ_FILES)
-	$(CXX) $(CXX_FLAGS) $(INCLUDE) -o $@ $^ $(LIB_FLAGS)
+	$(CXX) $(CXX_FLAGS) $(LDFLAGS) $(INCLUDE) -o $@ $^ $(LIB_FLAGS)
 
 # ================================
 # Compile any .cpp file into build/
@@ -92,9 +80,9 @@ $(OBJ_DIR)/%.o: %.cpp
 clean:
 	rm -rf $(OBJ_DIR) $(BIN) $(BIN).exe imgui.ini
 
-# Clean results folder
+# Clean configs and samples folder
 cr:
-	rm -rf results
+	rm -rf configs samples
 
 # Clean without libs
 cl:
@@ -113,3 +101,8 @@ rebuild: clean all run
 # Run with GDB
 gdb: $(BIN)
 	gdb -ex run -ex bt ./$(BIN)
+
+# Make without any external dependencies
+static:
+	$(MAKE) clean
+	$(MAKE) STATIC=1 all

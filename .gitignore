@@ -1,0 +1,6 @@
+*.exe
+samples/
+configs/
+.vscode
+build/
+NoiseGoblin

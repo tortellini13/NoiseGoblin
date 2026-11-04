@@ -1,8 +1,6 @@
-#pragma once
-
 #include "AudioManager.hpp"
 
-AudioManager::AudioManager()
+AudioManager::AudioManager(GlobalConfigs& gconfigs) : gconfigs(gconfigs)
 {
     result = ma_engine_init(NULL, &engine);
     if (result != MA_SUCCESS)
@@ -17,33 +15,54 @@ AudioManager::~AudioManager()
 
 //=====================================================================================
 
-void AudioManager::setGlobalVolume(float globalVolume)
-{
-    float volume = std::clamp(globalVolume, 0.0f, 1.0f);
-    ma_engine_set_volume(&engine, volume);
-} // end setGlobalVolume
-
 bool AudioManager::playSample(std::string audio_file, SampleConfigs configs)
 {
-    // Load sound from file
+    std::cout << "Playing file: " << audio_file << "\n";
+
+    // Clean up previous sound, if one exists
+    if (sound)
+    {
+        ma_sound_stop(sound.get());
+        ma_sound_uninit(sound.get());
+        sound.reset();
+
+        if (gconfigs.debug_mode)
+            std::cout << "Cleaning up previous ma_sound object\n";
+    }
+
+    // Allocate new sound
     sound = std::make_unique<ma_sound>();
-    result = ma_sound_init_from_file(&engine, audio_file.c_str(), 0, NULL, NULL, sound.get());
+
+    std::string file_path = "samples/" + audio_file;
+
+    result = ma_sound_init_from_file(
+        &engine,
+        file_path.c_str(),
+        0,
+        NULL,
+        NULL,
+        sound.get()
+    );
 
     if (result != MA_SUCCESS)
     {
         sound.reset();
-        error("AudioManager", "Audio sample favoid setSampleParams(SampleParams params)iled to load");
+        error("AudioManager", "Audio sample failed to load: " + audio_file);
         return false;
     }
 
-    // Set callback for when sound finishes playing
-    ma_sound_set_end_callback(sound.get(), onPlaybackFinished, this);
-
-    // Set sample parameters and play sound
     ma_sound_set_volume(sound.get(), configs.volume);
-    (configs.fade_in_ms.has_value()) ? ma_sound_set_fade_in_milliseconds(sound.get(), 0, configs.volume, configs.fade_in_ms.value()) : error("AudioManager", "Sample fade in time not specified");
-    (configs.pan.has_value()) ? ma_sound_set_pan(sound.get(), configs.pan.value()) : error("AudioManager", "Sample pan not specified");
-    (configs.pitch.has_value()) ? ma_sound_set_pitch(sound.get(), configs.pitch.value()) : error("AudioManager", "Sample pitch not specified");
+
+    if (configs.fade_in_ms.has_value())
+        ma_sound_set_fade_in_milliseconds(
+            sound.get(), 0, configs.volume, configs.fade_in_ms.value()
+        );
+
+    if (configs.pan.has_value())
+        ma_sound_set_pan(sound.get(), configs.pan.value());
+
+    if (configs.pitch.has_value())
+        ma_sound_set_pitch(sound.get(), configs.pitch.value());
 
     result = ma_sound_start(sound.get());
 
@@ -57,8 +76,3 @@ bool AudioManager::playSample(std::string audio_file, SampleConfigs configs)
 
     return true;
 } // end playSample
-
-void AudioManager::onPlaybackFinished(void *userData, ma_sound *sound)
-{
-    ma_sound_uninit(sound);
-} // end onPlaybackFinished

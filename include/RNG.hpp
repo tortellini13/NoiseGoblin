@@ -1,4 +1,24 @@
-// Chooses a random sample from available files using thir weights
-// Method to print out the current odds for each sample
-// Generates a new sample each time scheduler calls for one. Do not pregenerate list
-// Keeps track of last few samples used
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <random>
+#include <algorithm>
+
+#include "Configs.hpp"
+#include "Error.hpp"
+
+class RNG
+{
+public:
+    RNG();
+    ~RNG() = default;
+
+    std::string chooseSample(SampleList& samples);
+    int chooseInterval(const int max_interval_s, const int min_interval_s);
+
+private:
+    std::mt19937 engine;
+    std::vector<std::string> prev_samples{"", "", ""};
+}; // end RNG

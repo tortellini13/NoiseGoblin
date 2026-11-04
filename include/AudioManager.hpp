@@ -1,4 +1,4 @@
-// Loads a specified sample and plays it with miniaudio
+#pragma once
 
 #include "miniaudio.h"
 #include <string>
@@ -11,14 +11,13 @@
 class AudioManager
 {
 public:
-    AudioManager();
+    AudioManager(GlobalConfigs &configs);
     ~AudioManager();
 
-    void setGlobalVolume(float globalVolume);
     bool playSample(std::string audio_file, SampleConfigs configs);
 
 private:
-    static void onPlaybackFinished(void *userData, ma_sound *sound);
+    GlobalConfigs gconfigs;
     ma_result result;
     ma_engine engine;
     std::unique_ptr<ma_sound> sound;
