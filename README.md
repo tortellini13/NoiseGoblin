@@ -21,6 +21,9 @@ The following sections will detail how to set up each config file and the option
 	- 0 - MAXINT
 - min_interval_s: Minimum amount of time between samples
 	- 0 - MAXINT
+- prevent_duplicates: Whether to prevent any of the past 3 samples from being played. Automatically turns off if less than 4 samples are loaded
+	- true
+	- false
 ### SampleConfig.json
 - fade_in_ms: Fade in time at the start of each sample
 	- 0.0 - MAXFLOAT

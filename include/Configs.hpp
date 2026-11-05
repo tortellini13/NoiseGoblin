@@ -21,8 +21,8 @@ struct GlobalConfigs
 {
     bool debug_mode = false;
     float global_volume = 1.0;
-    int max_interval_s = 60 * 60 * 2; // 2 hours
-    int min_interval_s = 60 * 10;     // 10 mins
+    int max_interval_s = 60 * 30; // 30 mins
+    int min_interval_s = 10;      // 10 seconds
     bool prevent_duplicates = true;
 }; // end GlobalConfigs
 
