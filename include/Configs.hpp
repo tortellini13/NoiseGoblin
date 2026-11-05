@@ -19,10 +19,11 @@ enum Rarity : uint8_t
 
 struct GlobalConfigs
 {
+    std::string audio_samples_folder = "audio"; // If full path isn't defined, will start in same directory as NoiseGoblin
     bool debug_mode = false;
-    float global_volume = 1.0;
-    int max_interval_s = 60 * 30; // 30 mins
-    int min_interval_s = 10;      // 10 seconds
+    float global_volume = 1.0;     // [0.0, 1.0]
+    uint max_interval_s = 60 * 30; // 30 mins
+    uint min_interval_s = 10;      // 10 seconds
     bool prevent_duplicates = true;
 }; // end GlobalConfigs
 
@@ -31,7 +32,7 @@ struct SampleConfigs
     std::optional<float> fade_in_ms = 0.0; // [0ms, any]
     std::optional<float> pan = 0.0;        // [-1.0, 1.0]
     std::optional<float> pitch = 1.0;      // [0.5, 2.0] [1 oct lower, 1 oct higher]
-    float volume = 1.0f;                   // [0.0, 1.0]
+    float volume = 1.0;                    // [0.0, 1.0]
     uint8_t weight = 100;
 }; // end SampleConfigs
 

@@ -10,17 +10,17 @@
 #include "Configs.hpp"
 #include "Error.hpp"
 
-inline void scanSampleFiles(SampleList &samples)
+inline bool scanSampleFiles(std::string &audio_sample_folder, SampleList &samples)
 {
     namespace fs = std::filesystem;
 
-    const fs::path audio_directory = "samples";
+    const fs::path audio_directory = audio_sample_folder;
 
     // Create audio directory if it doesn't exist
     if (!fs::exists(audio_directory))
     {
+        error("FileManager", "No audio directory detected. Creating one now at: " + audio_sample_folder);
         fs::create_directories(audio_directory);
-        error("FileManager", "No audio files detected. Please add samples and run again");
     }
 
     // Supported file extensions
@@ -35,7 +35,7 @@ inline void scanSampleFiles(SampleList &samples)
     if (std::filesystem::is_empty(audio_directory))
     {
         error("FileManager", "No audio files detected. Please add samples and run again");
-        return;
+        return false;
     }
 
     for (const auto& entry : fs::directory_iterator(audio_directory))
@@ -76,4 +76,6 @@ inline void scanSampleFiles(SampleList &samples)
         // Add sample if it doesn't already exist
         samples.try_emplace(name, SampleConfigs{});
     }
+
+    return true;
 } // end scanSampleFiles

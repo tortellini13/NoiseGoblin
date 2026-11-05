@@ -33,7 +33,7 @@ bool AudioManager::playSample(std::string audio_file, SampleConfigs configs)
     // Allocate new sound
     sound = std::make_unique<ma_sound>();
 
-    std::string file_path = "samples/" + audio_file;
+    std::string file_path = gconfigs.audio_samples_folder + "/" + audio_file;
 
     result = ma_sound_init_from_file(
         &engine,

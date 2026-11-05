@@ -1,6 +1,6 @@
 #include "RNG.hpp"
 
-RNG::RNG(GlobalConfigs &configs) : engine(std::random_device{}()), gconfigs(configs)
+RNG::RNG(GlobalConfigs &configs) : gconfigs(configs), engine(std::random_device{}())
 {
 
 } // end RNG

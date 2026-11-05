@@ -1,4 +1,5 @@
 *.exe
+audio/
 samples/
 configs/
 .vscode

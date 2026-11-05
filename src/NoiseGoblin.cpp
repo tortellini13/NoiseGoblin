@@ -10,13 +10,17 @@
 
 int main()
 {
-    SampleList samples;
-    scanSampleFiles(samples);
-
-    GlobalConfigs global_configs;
     ConfigManager config_manager;
-
+    GlobalConfigs global_configs;
     config_manager.readGlobalConfigs(global_configs);
+
+    SampleList samples;
+    if(!scanSampleFiles(global_configs.audio_samples_folder, samples))
+    {
+        config_manager.createSampleConfigs();
+        return -1;
+    }
+
     if (samples.size() < 4)
     {
         error("NoiseGoblin", "Less than 4 samples found, removing duplicate prevention");

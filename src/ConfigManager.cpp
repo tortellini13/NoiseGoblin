@@ -17,6 +17,7 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
 
         GlobalConfigs defaults;
 
+        global_data["audio_samples_folder"] = defaults.audio_samples_folder;
         global_data["debug_mode"] = defaults.debug_mode;
         global_data["global_volume"] = defaults.global_volume;
         global_data["max_interval_s"] = defaults.max_interval_s;
@@ -55,9 +56,48 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
         return;
     }
 
-    // Populate missing settings with defaults
+    // Populate missing and invalid settings with defaults
     GlobalConfigs defaults;
 
+    // Global volume
+    if (!global_data["global_volume"].is_number() ||
+        !std::isfinite(global_data["global_volume"].get<double>()) ||
+        global_data["global_volume"].get<double>() < 0.0 ||
+        global_data["global_volume"].get<double>() > 1.0)
+    {
+        error("ConfigManager", "Invalid global volume. Using default");
+        global_data["global_volume"] = defaults.global_volume;
+    }
+
+    // Maximum interval
+    if (!global_data["max_interval_s"].is_number() ||
+        !std::isfinite(global_data["max_interval_s"].get<double>()) ||
+        global_data["max_interval_s"].get<double>() <= 0.0)
+    {
+        error("ConfigManager", "Invalid maximum interval. Using default");
+        global_data["max_interval_s"] = defaults.max_interval_s;
+    }
+
+    // Minimum interval
+    if (!global_data["min_interval_s"].is_number() ||
+        !std::isfinite(global_data["min_interval_s"].get<double>()) ||
+        global_data["min_interval_s"].get<double>() <= 0.0)
+    {
+        error("ConfigManager", "Invalid minimum interval. Using default");
+        global_data["min_interval_s"] = defaults.min_interval_s;
+    }
+
+    // Ensure minimum interval does not exceed maximum interval
+    if (global_data["min_interval_s"].get<double>() >
+        global_data["max_interval_s"].get<double>())
+    {
+        error("ConfigManager", "Minimum interval exceeds maximum interval. Swapping values");
+        global_data["min_interval_s"] = defaults.max_interval_s;
+        global_data["max_interval_s"] = defaults.min_interval_s;
+    }
+
+    // Fill in defaults when config is missing
+    global_data["audio_samples_folder"] = global_data.value("audio_samples_folder", defaults.audio_samples_folder);
     global_data["debug_mode"] = global_data.value("debug_mode", defaults.debug_mode);
     global_data["global_volume"] = global_data.value("global_volume", defaults.global_volume);
     global_data["max_interval_s"] = global_data.value("max_interval_s", defaults.max_interval_s);
@@ -65,6 +105,7 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
     global_data["prevent_duplicates"] = global_data.value("prevent_duplicates", defaults.prevent_duplicates);
 
     // Store global config values
+    global.audio_samples_folder = global_data["audio_samples_folder"]; 
     global.debug_mode = global_data["debug_mode"];
     global.global_volume = global_data["global_volume"];
     global.max_interval_s = global_data["max_interval_s"];
@@ -87,7 +128,7 @@ void ConfigManager::readSampleConfigs(SampleList &samples)
         std::ofstream sample_config_file("configs/SampleConfig.json");
         if (!sample_config_file)
         {
-            error("ConfigManager", "Unable to create GlobalConfig.json");
+            error("ConfigManager", "Unable to create SampleConfig.json");
             return;
         }
 
@@ -162,6 +203,24 @@ void ConfigManager::readSampleConfigs(SampleList &samples)
     if (updated_configs)
         updated_configs << std::fixed << std::setprecision(2) << updated_configs_json.dump(4);
 } // end readSampleConfigs
+
+void ConfigManager::createSampleConfigs()
+{
+    // Check for SampleConfig.json and create it if it doesn't exist
+    if (!std::filesystem::exists("configs/SampleConfig.json"))
+    {
+        error("ConfigManager", "SampleConfig.json does not exist, creating file");
+
+        std::ofstream sample_config_file("configs/SampleConfig.json");
+        if (!sample_config_file)
+        {
+            error("ConfigManager", "Unable to create SampleConfig.json");
+            return;
+        }
+
+        return;
+    }
+} // end createSampleConfigs
 
 //=====================================================================================
 
