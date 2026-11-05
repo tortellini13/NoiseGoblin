@@ -39,5 +39,6 @@ The following sections will detail how to set up each config file and the option
 	- Rare: 50
 	- Epic: 25
 	- Legendary: 10
+	- Mythic 5
 	- Divine: 1
 	- Disabled: 0
