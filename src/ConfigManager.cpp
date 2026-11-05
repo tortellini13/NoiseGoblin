@@ -21,6 +21,7 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
         global_data["global_volume"] = defaults.global_volume;
         global_data["max_interval_s"] = defaults.max_interval_s;
         global_data["min_interval_s"] = defaults.min_interval_s;
+        global_data["prevent_duplicates"] = defaults.prevent_duplicates;
 
         std::ofstream global_config_file("configs/GlobalConfig.json");
         if (!global_config_file)
@@ -31,6 +32,8 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
 
         global_config_file << global_data.dump(4);
         global_config_file.close();
+
+        return;
     }
 
     // Open GlobalConfig.json
@@ -59,12 +62,14 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
     global_data["global_volume"] = global_data.value("global_volume", defaults.global_volume);
     global_data["max_interval_s"] = global_data.value("max_interval_s", defaults.max_interval_s);
     global_data["min_interval_s"] = global_data.value("min_interval_s", defaults.min_interval_s);
+    global_data["prevent_duplicates"] = global_data.value("prevent_duplicates", defaults.prevent_duplicates);
 
     // Store global config values
     global.debug_mode = global_data["debug_mode"];
     global.global_volume = global_data["global_volume"];
     global.max_interval_s = global_data["max_interval_s"];
     global.min_interval_s = global_data["min_interval_s"];
+    global.prevent_duplicates = global_data["prevent_duplicates"];
 
     // Write updated config back to file
     std::ofstream updated_configs("configs/GlobalConfig.json");
@@ -74,14 +79,6 @@ void ConfigManager::readGlobalConfigs(GlobalConfigs &global)
 
 void ConfigManager::readSampleConfigs(SampleList &samples)
 {
-    /*
-    - Check if SampleConfigs.json exists. If not, create file
-    - Read all configs into a map <"file name", SampleConfigs>
-    - Compare map to the list of files found
-    - Add a new entry into SampleConfigs.json if file found but no entry
-    - Remove from map if entry found but no file
-    */
-
     // Check for SampleConfig.json and create it if it doesn't exist
     if (!std::filesystem::exists("configs/SampleConfig.json"))
     {
@@ -93,6 +90,8 @@ void ConfigManager::readSampleConfigs(SampleList &samples)
             error("ConfigManager", "Unable to create GlobalConfig.json");
             return;
         }
+
+        return;
     }
 
     // Load SampleConfigs.json
@@ -165,11 +164,6 @@ void ConfigManager::readSampleConfigs(SampleList &samples)
 } // end readSampleConfigs
 
 //=====================================================================================
-
-// void ConfigManager::addSampleConfig(std::string sampleName, SampleConfigs config)
-// {
-
-// } // addSampleConfig
 
 uint8_t ConfigManager::rarityToWeight(std::string rarity)
 {

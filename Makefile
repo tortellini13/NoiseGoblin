@@ -15,7 +15,7 @@ endif
 # ================================
 #   Compiler and general flags
 # ================================
-VERSION := 0.1.0-alpha
+VERSION := 1.0.0
 CXX := g++
 CXX_FLAGS := -g -Wall -Wextra -O3 -fno-strict-aliasing -Wswitch -DVERSION='"$(VERSION)"'
 LIB_FLAGS :=

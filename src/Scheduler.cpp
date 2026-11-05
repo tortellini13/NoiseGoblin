@@ -6,7 +6,8 @@ Scheduler::Scheduler(
     AudioManager &audio_manager)
     : samples(samples),
       configs(configs),
-      audio_manager(audio_manager)
+      audio_manager(audio_manager),
+      rng(configs)
 {
 } // end Scheduler
 

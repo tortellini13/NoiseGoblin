@@ -1,7 +1,7 @@
 # Noise Goblin
 Noise Goblin is a background program that plays randomly selected user supplied audio clips at a random interval. The inspiration came from those 1 hour of silence separated by XX videos.
 ## Usage
-1. Run NoiseGoblin once to generate config and sample folders
+1. Run NoiseGoblin once to generate config and sample folders. Recommended to pllace NoiseGoblin in it's own folder as it will create folders in the same directory as the program
 2. Close the program and place desired samples in the "samples" folder that it created in the same directory. Below are the currently supported audio file types
 	- .wav
 	- .mp3

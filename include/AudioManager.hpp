@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
+#include <memory>
 
 #include "Configs.hpp"
 #include "Error.hpp"

@@ -1,6 +1,6 @@
 #include "RNG.hpp"
 
-RNG::RNG() : engine(std::random_device{}())
+RNG::RNG(GlobalConfigs &configs) : engine(std::random_device{}()), gconfigs(configs)
 {
 
 } // end RNG
@@ -18,7 +18,7 @@ std::string RNG::chooseSample(SampleList &samples)
     for (const auto &[filename, parameters] : samples)
     {
         // Skip recently played samples
-        if (std::find(prev_samples.begin(), prev_samples.end(), filename) != prev_samples.end())
+        if (gconfigs.prevent_duplicates && std::find(prev_samples.begin(), prev_samples.end(), filename) != prev_samples.end())
             continue;
 
         filenames.push_back(filename);

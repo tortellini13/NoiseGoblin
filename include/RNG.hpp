@@ -12,13 +12,14 @@
 class RNG
 {
 public:
-    RNG();
+    RNG(GlobalConfigs &configs);
     ~RNG() = default;
 
     std::string chooseSample(SampleList& samples);
     int chooseInterval(const int max_interval_s, const int min_interval_s);
 
 private:
+    GlobalConfigs gconfigs;
     std::mt19937 engine;
     std::vector<std::string> prev_samples{"", "", ""};
 }; // end RNG

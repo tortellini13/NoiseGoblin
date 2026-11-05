@@ -23,6 +23,7 @@ struct GlobalConfigs
     float global_volume = 1.0;
     int max_interval_s = 60 * 60 * 2; // 2 hours
     int min_interval_s = 60 * 10;     // 10 mins
+    bool prevent_duplicates = true;
 }; // end GlobalConfigs
 
 struct SampleConfigs

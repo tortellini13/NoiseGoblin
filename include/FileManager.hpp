@@ -1,8 +1,3 @@
-// Reads file system and returns a list of available audio files
-// Refreshes if a change is detected in the folder
-// Uses a default folder but allows for user to override location
-// Later integration for a file explorer
-// Check length of file and ignore if it is too long
 #pragma once
 
 #include <map>
@@ -15,7 +10,7 @@
 #include "Configs.hpp"
 #include "Error.hpp"
 
-inline bool scanSampleFiles(SampleList &samples)
+inline void scanSampleFiles(SampleList &samples)
 {
     namespace fs = std::filesystem;
 
@@ -25,9 +20,7 @@ inline bool scanSampleFiles(SampleList &samples)
     if (!fs::exists(audio_directory))
     {
         fs::create_directories(audio_directory);
-
         error("FileManager", "No audio files detected. Please add samples and run again");
-        return false;
     }
 
     // Supported file extensions
@@ -42,7 +35,7 @@ inline bool scanSampleFiles(SampleList &samples)
     if (std::filesystem::is_empty(audio_directory))
     {
         error("FileManager", "No audio files detected. Please add samples and run again");
-        return false;
+        return;
     }
 
     for (const auto& entry : fs::directory_iterator(audio_directory))
@@ -83,17 +76,4 @@ inline bool scanSampleFiles(SampleList &samples)
         // Add sample if it doesn't already exist
         samples.try_emplace(name, SampleConfigs{});
     }
-
-    return true;
 } // end scanSampleFiles
-
-// class FileManager
-// {
-// public:
-//     FileManager();
-//     ~FileManager();
-
-//     void readSampleFiles(std::map<std::string, SampleConfigs> &samples);
-
-// private:
-// }; // end FileManager
