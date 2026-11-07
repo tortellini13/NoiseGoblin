@@ -22,8 +22,8 @@ struct GlobalConfigs
     std::string audio_samples_folder = "audio"; // If full path isn't defined, will start in same directory as NoiseGoblin
     bool debug_mode = false;
     float global_volume = 1.0;     // [0.0, 1.0]
-    uint max_interval_s = 60 * 30; // 30 mins
-    uint min_interval_s = 10;      // 10 seconds
+    uint32_t max_interval_s = 60 * 30; // 30 mins
+    uint32_t min_interval_s = 10;      // 10 seconds
     bool prevent_duplicates = true;
 }; // end GlobalConfigs
 
